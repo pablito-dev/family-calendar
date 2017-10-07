@@ -1,18 +1,22 @@
 package main
 
 import (
-	"fmt"
-	"html"
-	"log"
 	"net/http"
+
+	"goji.io"
+	"goji.io/pat"
+
+	"github.com/pablito-dev/family-calendar/utils"
 )
 
-func handleIndex(writer http.ResponseWriter, request *http.Request) {
-	fmt.Fprint(writer, "Hello world", html.EscapeString(request.URL.Path))
-}
 
 func main()  {
-	http.HandleFunc( "/", handleIndex)
+	mux := goji.NewMux()
+	mux.HandleFunc(pat.Get("/events"), getEvents)
 
-	log.Fatal(http.ListenAndServe(":8080", nil))
+	http.ListenAndServe("localhost:8080", mux)
+}
+
+func getEvents(w http.ResponseWriter, r *http.Request) {
+	utils.ResponseWithJSON(w, []byte("{message: Hello world}"), 200)
 }
