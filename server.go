@@ -19,6 +19,7 @@ func main()  {
 	mux := goji.NewMux()
 	mux.HandleFunc(pat.Get("/events"), dao.GetEvents(session))
 	mux.HandleFunc(pat.Get("/events/:eventId"), dao.GetEventById(session))
+	mux.HandleFunc(pat.Post("/events"), dao.CreateEvent(session))
 
 	http.ListenAndServe("localhost:8080", mux)
 }
