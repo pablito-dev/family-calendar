@@ -81,6 +81,9 @@ func CreateEvent(s *mgo.Session) func(w http.ResponseWriter, r *http.Request) {
 			responseutils.RespondWithError(w, err.Error(), 500)
 		}
 
-		responseutils.RespondWithLocationHeader(w, r, newEvent.Id)
+		var headers = make(map[string]string)
+
+		headers["Location"] = r.URL.Path + "/" + newEvent.Id
+		responseutils.RespondWithCode(w, headers, 201)
 	}
 }

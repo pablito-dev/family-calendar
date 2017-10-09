@@ -17,8 +17,10 @@ func RespondWithError(w http.ResponseWriter, message string, code int) {
 	fmt.Fprint(w, "{message: %q", message)
 }
 
-func RespondWithLocationHeader(w http.ResponseWriter, r *http.Request, id string) {
+func RespondWithCode(w http.ResponseWriter, headers map[string]string, code int) {
 	w.Header().Set("Content-Type", "application/json; charset=utf-8")
-	w.Header().Set("Location", r.URL.Path + "/" + id)
-	w.WriteHeader(http.StatusCreated)
+	for k, v := range headers {
+		w.Header().Set(k, v)
+	}
+	w.WriteHeader(code)
 }
