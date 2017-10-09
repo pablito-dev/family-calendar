@@ -87,3 +87,20 @@ func CreateEvent(s *mgo.Session) func(w http.ResponseWriter, r *http.Request) {
 		responseutils.RespondWithCode(w, headers, 201)
 	}
 }
+
+func DeleteEvent (s *mgo.Session) func(w http.ResponseWriter, r *http.Request) {
+	return func(w http.ResponseWriter, r *http.Request) {
+		session := s.Copy()
+		collection := databaseutils.SetCollectionInNewSession(session)
+		id := pat.Param(r, "eventId")
+
+		defer session.Close()
+
+		err := collection.Remove(bson.M{"id": id})
+		if err != nil {
+			responseutils.RespondWithError(w, err.Error(), 500)
+		}
+
+		responseutils.RespondWithCode(w, nil, 204)
+	}
+}
