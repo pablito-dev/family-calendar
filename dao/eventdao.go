@@ -88,7 +88,7 @@ func CreateEvent(s *mgo.Session) func(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func DeleteEvent (s *mgo.Session) func(w http.ResponseWriter, r *http.Request) {
+func DeleteEvent(s *mgo.Session) func(w http.ResponseWriter, r *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
 		session := s.Copy()
 		collection := databaseutils.SetCollectionInNewSession(session)
@@ -102,5 +102,39 @@ func DeleteEvent (s *mgo.Session) func(w http.ResponseWriter, r *http.Request) {
 		}
 
 		responseutils.RespondWithCode(w, nil, 204)
+	}
+}
+
+func UpdateEvent(s *mgo.Session) func(w http.ResponseWriter, r *http.Request) {
+	return func(w http.ResponseWriter, r *http.Request) {
+		var event models.Event
+		session := s.Copy()
+		collection := databaseutils.SetCollectionInNewSession(session)
+		id := pat.Param(r, "eventId")
+
+		err := json.NewDecoder(r.Body).Decode(&event)
+		if err != nil {
+			responseutils.RespondWithError(w, err.Error(), 500)
+		}
+
+		event.Id = id
+
+		err = collection.Update(bson.M{"id": id}, &event)
+		if err != nil {
+			switch err {
+			default:
+				responseutils.RespondWithError(w, err.Error(), 500)
+				return
+			case mgo.ErrNotFound:
+				responseutils.RespondWithError(w, err.Error(), 404)
+				return
+			}
+
+			var headers= make(map[string]string)
+
+			headers["Location"] = r.URL.Path + "/" + event.Id
+
+			responseutils.RespondWithCode(w, headers, 200)
+		}
 	}
 }
