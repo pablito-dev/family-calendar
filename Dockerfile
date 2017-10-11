@@ -8,4 +8,6 @@ RUN go get gopkg.in/mgo.v2
 
 RUN go install github.com/pablito-dev/family-calendar
 
+ENTRYPOINT go/bin/family-calendar
+
 EXPOSE 8080
